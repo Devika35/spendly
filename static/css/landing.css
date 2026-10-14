@@ -63,6 +63,10 @@
 
 .home-hero-btn {
     display: inline-block;
+    border: 0;
+    font-family: inherit;
+    line-height: inherit;
+    cursor: pointer;
     background: #111111;
     color: #ffffff;
     font-size: 1.2rem;
@@ -180,6 +184,64 @@
 .home-hero-bar-travel { background: #4a85d6; }
 .home-hero-bar-bills  { background: #7e6fd1; }
 
+/* ------------------------------------------------------------------ */
+/* Landing — video modal                                               */
+/* ------------------------------------------------------------------ */
+
+.video-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    background: rgba(15, 15, 15, 0.75);
+}
+
+.video-modal[hidden] { display: none; }
+
+.video-modal-dialog {
+    position: relative;
+    width: 100%;
+    max-width: 960px;
+}
+
+.video-modal-frame {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    background: #000000;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+}
+
+.video-modal-frame iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+}
+
+.video-modal-close {
+    position: absolute;
+    top: -3rem;
+    right: 0;
+    width: 2.5rem;
+    height: 2.5rem;
+    border: 0;
+    border-radius: 50%;
+    background: var(--paper-card);
+    color: #111111;
+    font-family: inherit;
+    font-size: 1.6rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.video-modal-close:hover { background: var(--paper-warm); }
+
 /* Responsive */
 
 @media (max-width: 700px) {
@@ -189,4 +251,5 @@
     .home-hero-dashboard { padding: 1.25rem; margin-top: 3rem; }
     .home-hero-stats { grid-template-columns: 1fr; }
     .home-hero-bar-row { gap: 1rem; }
+    .video-modal { padding: 1rem; }
 }
