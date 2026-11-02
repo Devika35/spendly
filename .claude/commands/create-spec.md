@@ -27,7 +27,7 @@ If the step number or feature name is missing, stop and say:
 Example: /create-spec 2 registration"
 
 ## Step 2 — Check existing specs
-Use Glob to list files in `specs/`.
+Use Glob to list files in `.claude/specs/`.
 
 - If a spec with the same step number already exists, stop and say:
   "Spec for step <step_number> already exists: <filename>. Choose a different step number."
@@ -43,7 +43,7 @@ Read these files before writing anything:
 Do not guess. Base the spec on what actually exists in the code.
 
 ## Step 4 — Write the spec
-Create the file `specs/<step_number>-<feature_slug>.md` using exactly this structure:
+Create the file `.claude/specs/<step_number>-<feature_slug>.md` using exactly this structure:
 
 ```
 # Spec: <feature_title>
