@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}Profile — Spendly{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css') }}">
+{% endblock %}
+
+{% block content %}
+<section class="profile-section">
+    <div class="profile-container">
+
+        <div class="profile-card profile-header">
+            <div class="profile-avatar">{{ user.initials }}</div>
+            <div class="profile-identity">
+                <h1 class="profile-name">{{ user.name }}</h1>
+                <p class="profile-email">{{ user.email }}</p>
+                <p class="profile-since">Member since {{ user.member_since }}</p>
+            </div>
+        </div>
+
+        <div class="profile-stats">
+            <div class="profile-stat">
+                <span class="profile-label">Total spent</span>
+                <span class="profile-stat-value">₹{{ '{:,.2f}'.format(stats.total) }}</span>
+            </div>
+            <div class="profile-stat">
+                <span class="profile-label">Transactions</span>
+                <span class="profile-stat-value">{{ stats.count }}</span>
+            </div>
+            <div class="profile-stat">
+                <span class="profile-label">Top category</span>
+                <span class="profile-stat-value">{{ stats.top_category or '—' }}</span>
+            </div>
+        </div>
+
+        <div class="profile-grid">
+            <div class="profile-card">
+                <h2 class="profile-card-title">Transaction history</h2>
+                <div class="profile-table-wrap">
+                    <table class="profile-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Description</th>
+                                <th>Category</th>
+                                <th class="profile-amount">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for t in transactions %}
+                            <tr>
+                                <td class="profile-date">{{ t.date }}</td>
+                                <td>{{ t.description or '—' }}</td>
+                                <td><span class="badge badge-{{ t.category|lower }}">{{ t.category }}</span></td>
+                                <td class="profile-amount">₹{{ '{:,.2f}'.format(t.amount) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="profile-card">
+                <h2 class="profile-card-title">By category</h2>
+                <div class="profile-bars">
+                    {% for c in categories %}
+                    <div class="profile-bar-row">
+                        <span class="profile-bar-name">{{ c.name }}</span>
+                        <div class="profile-bar-track">
+                            <div class="profile-bar" style="--pct: {{ c.percent }}%"></div>
+                        </div>
+                        <span class="profile-bar-amount">₹{{ '{:,.2f}'.format(c.total) }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+{% endblock %}
