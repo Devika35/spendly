@@ -1,0 +1,259 @@
+/* ------------------------------------------------------------------ */
+/* Profile page                                                        */
+/* ------------------------------------------------------------------ */
+
+.profile-section {
+    padding: 3rem 2rem;
+}
+
+.profile-container {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.profile-card {
+    background: var(--paper-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 1.75rem;
+    min-width: 0;
+}
+
+.profile-card-title {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 1.35rem;
+    color: var(--ink);
+    margin-bottom: 1.25rem;
+}
+
+.profile-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--ink-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+/* User info card ---------------------------------------------------- */
+
+.profile-header {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.profile-avatar {
+    flex-shrink: 0;
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--paper);
+    font-family: var(--font-display);
+    font-size: 1.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.profile-name {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 2rem;
+    color: var(--ink);
+    line-height: 1.2;
+}
+
+.profile-email {
+    color: var(--ink-muted);
+    font-size: 0.95rem;
+}
+
+.profile-since {
+    color: var(--ink-faint);
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+}
+
+/* Stats ------------------------------------------------------------- */
+
+.profile-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+}
+
+.profile-stat {
+    background: var(--paper-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 1.5rem 1.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.profile-stat-value {
+    font-family: var(--font-display);
+    font-size: 1.75rem;
+    color: var(--ink);
+}
+
+/* Transactions + categories ----------------------------------------- */
+
+.profile-grid {
+    display: grid;
+    grid-template-columns: 3fr 2fr;
+    gap: 1.5rem;
+    align-items: start;
+}
+
+.profile-table-wrap {
+    overflow-x: auto;
+}
+
+.profile-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.profile-table th {
+    text-align: left;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--ink-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 0 0.75rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.profile-table td {
+    padding: 0.85rem 0.75rem;
+    border-bottom: 1px solid var(--border-soft);
+    color: var(--ink-soft);
+    white-space: nowrap;
+}
+
+.profile-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.profile-table th:first-child,
+.profile-table td:first-child {
+    padding-left: 0;
+}
+
+.profile-table th:last-child,
+.profile-table td:last-child {
+    padding-right: 0;
+}
+
+.profile-date {
+    color: var(--ink-muted);
+}
+
+.profile-amount {
+    text-align: right;
+}
+
+.profile-table td.profile-amount {
+    font-weight: 500;
+    color: var(--ink);
+}
+
+/* Category badges --------------------------------------------------- */
+
+.badge {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    background: var(--paper-warm);
+    color: var(--ink-soft);
+}
+
+.badge-food {
+    background: var(--accent-light);
+    color: var(--accent);
+}
+
+.badge-transport,
+.badge-shopping {
+    background: var(--accent-2-light);
+    color: var(--accent-2);
+}
+
+.badge-bills,
+.badge-health {
+    background: var(--danger-light);
+    color: var(--danger);
+}
+
+.badge-entertainment,
+.badge-other {
+    background: var(--paper-warm);
+    color: var(--ink-soft);
+}
+
+/* Category bars ----------------------------------------------------- */
+
+.profile-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.profile-bar-row {
+    display: grid;
+    grid-template-columns: 100px 1fr 90px;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.profile-bar-name {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--ink-soft);
+}
+
+.profile-bar-track {
+    height: 8px;
+    background: var(--border-soft);
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.profile-bar {
+    width: var(--pct, 0%);
+    height: 100%;
+    background: var(--accent);
+    border-radius: 999px;
+}
+
+.profile-bar-amount {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--ink-muted);
+    text-align: right;
+}
+
+/* Responsive -------------------------------------------------------- */
+
+@media (max-width: 900px) {
+    .profile-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 600px) {
+    .profile-section { padding: 2rem 1rem; }
+    .profile-card { padding: 1.25rem; }
+    .profile-header { flex-direction: column; text-align: center; gap: 1rem; }
+    .profile-stats { grid-template-columns: 1fr; gap: 1rem; }
+    .profile-bar-row { grid-template-columns: 80px 1fr 80px; }
+}
