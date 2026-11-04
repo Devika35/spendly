@@ -1,11 +1,18 @@
 import os
 import re
 import sqlite3
+from datetime import datetime
 
 from flask import Flask, redirect, render_template, request, session, url_for
 from werkzeug.security import check_password_hash
 
 from database.db import create_user, get_db, get_user_by_email, init_db, seed_db
+from database.queries import (
+    get_category_breakdown,
+    get_recent_transactions,
+    get_summary_stats,
+    get_user_by_id,
+)
 
 EMAIL_PATTERN = re.compile(r"[^@\s]+@[^@\s]+\.[^@\s]+")
 MIN_PASSWORD_LENGTH = 8
@@ -98,33 +105,20 @@ def profile():
     if not session.get("user_id"):
         return redirect(url_for("login"))
 
-    # Hardcoded sample data — real queries arrive in Step 5
-    user = {
-        "name": "Demo User",
-        "email": "demo@spendly.com",
-        "initials": "DU",
-        "member_since": "January 2026",
-    }
-    stats = {"total": 5149.50, "count": 8, "top_category": "Bills"}
-    transactions = [
-        {"date": "25 Oct 2026", "description": None, "category": "Other", "amount": 150.00},
-        {"date": "20 Oct 2026", "description": "Dinner with friends", "category": "Food", "amount": 280.00},
-        {"date": "15 Oct 2026", "description": "New kurta", "category": "Shopping", "amount": 1299.00},
-        {"date": "12 Oct 2026", "description": "Movie tickets", "category": "Entertainment", "amount": 600.00},
-        {"date": "08 Oct 2026", "description": "Pharmacy", "category": "Health", "amount": 320.00},
-        {"date": "05 Oct 2026", "description": "Electricity bill", "category": "Bills", "amount": 1850.50},
-        {"date": "03 Oct 2026", "description": "Metro card recharge", "category": "Transport", "amount": 200.00},
-        {"date": "01 Oct 2026", "description": "Weekly groceries", "category": "Food", "amount": 450.00},
-    ]
-    categories = [
-        {"name": "Bills", "total": 1850.50, "percent": 36},
-        {"name": "Shopping", "total": 1299.00, "percent": 25},
-        {"name": "Food", "total": 730.00, "percent": 14},
-        {"name": "Entertainment", "total": 600.00, "percent": 12},
-        {"name": "Health", "total": 320.00, "percent": 6},
-        {"name": "Transport", "total": 200.00, "percent": 4},
-        {"name": "Other", "total": 150.00, "percent": 3},
-    ]
+    user = get_user_by_id(session["user_id"])
+    if user is None:
+        # Stale session, e.g. the DB was reset while the user was logged in
+        session.clear()
+        return redirect(url_for("login"))
+    user["initials"] = "".join(w[0] for w in user["name"].split()[:2]).upper()
+
+    transactions = get_recent_transactions(session["user_id"])
+    for t in transactions:
+        t["date"] = datetime.strptime(t["date"], "%Y-%m-%d").strftime("%d %b %Y")
+
+    stats = get_summary_stats(session["user_id"])
+    categories = get_category_breakdown(session["user_id"])
+
     return render_template(
         "profile.html",
         user=user,

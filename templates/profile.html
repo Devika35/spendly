@@ -22,11 +22,11 @@
         <div class="profile-stats">
             <div class="profile-stat">
                 <span class="profile-label">Total spent</span>
-                <span class="profile-stat-value">₹{{ '{:,.2f}'.format(stats.total) }}</span>
+                <span class="profile-stat-value">₹{{ '{:,.2f}'.format(stats.total_spent) }}</span>
             </div>
             <div class="profile-stat">
                 <span class="profile-label">Transactions</span>
-                <span class="profile-stat-value">{{ stats.count }}</span>
+                <span class="profile-stat-value">{{ stats.transaction_count }}</span>
             </div>
             <div class="profile-stat">
                 <span class="profile-label">Top category</span>
@@ -55,6 +55,10 @@
                                 <td><span class="badge badge-{{ t.category|lower }}">{{ t.category }}</span></td>
                                 <td class="profile-amount">₹{{ '{:,.2f}'.format(t.amount) }}</td>
                             </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="4" class="profile-empty">No expenses yet</td>
+                            </tr>
                             {% endfor %}
                         </tbody>
                     </table>
@@ -68,10 +72,12 @@
                     <div class="profile-bar-row">
                         <span class="profile-bar-name">{{ c.name }}</span>
                         <div class="profile-bar-track">
-                            <div class="profile-bar" style="--pct: {{ c.percent }}%"></div>
+                            <div class="profile-bar" style="--pct: {{ c.pct }}%"></div>
                         </div>
-                        <span class="profile-bar-amount">₹{{ '{:,.2f}'.format(c.total) }}</span>
+                        <span class="profile-bar-amount">₹{{ '{:,.2f}'.format(c.amount) }}</span>
                     </div>
+                    {% else %}
+                    <p class="profile-empty">No expenses yet</p>
                     {% endfor %}
                 </div>
             </div>

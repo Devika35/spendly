@@ -167,6 +167,12 @@
     color: var(--ink);
 }
 
+.profile-empty {
+    color: var(--ink-muted);
+    text-align: center;
+    padding: 1.5rem 0;
+}
+
 /* Category badges --------------------------------------------------- */
 
 .badge {
