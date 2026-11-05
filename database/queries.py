@@ -9,6 +9,18 @@ from datetime import datetime
 from database.db import get_db
 
 
+def _date_clause(date_from, date_to):
+    """Return (sql_fragment, params) for an inclusive date range.
+
+    Filters only when both bounds are given; otherwise returns ("", []) so the
+    query is unchanged. The fragment is a fixed string (never user input) with
+    a leading space; the date values are always bound as ? parameters.
+    """
+    if date_from and date_to:
+        return " AND date BETWEEN ? AND ?", [date_from, date_to]
+    return "", []
+
+
 def get_user_by_id(user_id):
     """Return {"name", "email", "member_since"} for the user, or None."""
     conn = get_db()
@@ -32,18 +44,20 @@ def get_user_by_id(user_id):
 
 # --- TRANSACTIONS --------------------------------------------------- #
 
-def get_recent_transactions(user_id, limit=10):
+def get_recent_transactions(user_id, limit=10, date_from=None, date_to=None):
     """Return the user's newest expenses as a list of dicts (newest first).
 
     Each dict has keys date (ISO 'YYYY-MM-DD'), description, category, amount.
-    Returns [] if the user has no expenses.
+    Optional date_from / date_to (ISO strings) limit results to that inclusive
+    range. Returns [] if the user has no expenses in range.
     """
+    date_sql, date_params = _date_clause(date_from, date_to)
     conn = get_db()
     try:
         rows = conn.execute(
             "SELECT date, description, category, amount FROM expenses "
-            "WHERE user_id = ? ORDER BY date DESC, id DESC LIMIT ?",
-            (user_id, limit),
+            f"WHERE user_id = ?{date_sql} ORDER BY date DESC, id DESC LIMIT ?",
+            (user_id, *date_params, limit),
         ).fetchall()
     finally:
         conn.close()
@@ -64,19 +78,23 @@ def get_recent_transactions(user_id, limit=10):
 
 # --- SUMMARY STATS -------------------------------------------------- #
 
-def get_summary_stats(user_id):
-    """Return {"total_spent", "transaction_count", "top_category"} for the user."""
+def get_summary_stats(user_id, date_from=None, date_to=None):
+    """Return {"total_spent", "transaction_count", "top_category"} for the user.
+
+    Optional date_from / date_to (ISO strings) limit stats to that inclusive range.
+    """
+    date_sql, date_params = _date_clause(date_from, date_to)
     conn = get_db()
     try:
         totals = conn.execute(
             "SELECT COALESCE(SUM(amount), 0) AS total, COUNT(*) AS cnt "
-            "FROM expenses WHERE user_id = ?",
-            (user_id,),
+            f"FROM expenses WHERE user_id = ?{date_sql}",
+            (user_id, *date_params),
         ).fetchone()
         top = conn.execute(
-            "SELECT category FROM expenses WHERE user_id = ? "
+            f"SELECT category FROM expenses WHERE user_id = ?{date_sql} "
             "GROUP BY category ORDER BY SUM(amount) DESC LIMIT 1",
-            (user_id,),
+            (user_id, *date_params),
         ).fetchone()
     finally:
         conn.close()
@@ -96,18 +114,22 @@ def get_summary_stats(user_id):
 
 # --- CATEGORY BREAKDOWN --------------------------------------------- #
 
-def get_category_breakdown(user_id):
+def get_category_breakdown(user_id, date_from=None, date_to=None):
     """Return [{"name", "amount", "pct"}] per category, largest first.
 
     pct values are ints that sum to exactly 100; the largest category absorbs
-    the rounding remainder. Returns [] when the user has no expenses.
+    the rounding remainder. Optional date_from / date_to (ISO strings) limit
+    the breakdown to that inclusive range. Returns [] when there are no
+    expenses in range.
     """
+    date_sql, date_params = _date_clause(date_from, date_to)
     conn = get_db()
     try:
         rows = conn.execute(
             "SELECT category, SUM(amount) AS total FROM expenses "
-            "WHERE user_id = ? GROUP BY category ORDER BY SUM(amount) DESC",
-            (user_id,),
+            f"WHERE user_id = ?{date_sql} "
+            "GROUP BY category ORDER BY SUM(amount) DESC",
+            (user_id, *date_params),
         ).fetchall()
     finally:
         conn.close()

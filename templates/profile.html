@@ -19,6 +19,35 @@
             </div>
         </div>
 
+        {% with messages = get_flashed_messages() %}
+        {% for message in messages %}
+        <div class="auth-error profile-filter-error">{{ message }}</div>
+        {% endfor %}
+        {% endwith %}
+
+        <div class="profile-card profile-filter">
+            <nav class="profile-filter-presets" aria-label="Date range presets">
+                {% for p in presets %}
+                <a href="{{ url_for('profile', date_from=p.date_from, date_to=p.date_to) }}"
+                   class="profile-filter-preset{% if p.key == active_preset %} is-active{% endif %}"
+                   {% if p.key == active_preset %}aria-current="page"{% endif %}>{{ p.label }}</a>
+                {% endfor %}
+            </nav>
+
+            <form method="get" action="{{ url_for('profile') }}"
+                  class="profile-filter-form{% if active_preset is none %} is-active{% endif %}">
+                <label class="profile-filter-field">
+                    <span class="profile-label">From</span>
+                    <input type="date" name="date_from" value="{{ date_from or '' }}" required>
+                </label>
+                <label class="profile-filter-field">
+                    <span class="profile-label">To</span>
+                    <input type="date" name="date_to" value="{{ date_to or '' }}" required>
+                </label>
+                <button type="submit" class="profile-filter-apply">Apply</button>
+            </form>
+        </div>
+
         <div class="profile-stats">
             <div class="profile-stat">
                 <span class="profile-label">Total spent</span>
