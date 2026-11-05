@@ -79,6 +79,99 @@
     margin-top: 0.25rem;
 }
 
+/* Filter bar -------------------------------------------------------- */
+
+.profile-filter {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem 1.5rem;
+    padding: 1.25rem 1.75rem;
+}
+
+.profile-filter-error {
+    margin-bottom: 0;
+}
+
+.profile-filter-presets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.profile-filter-preset {
+    padding: 0.45rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--ink-soft);
+    text-decoration: none;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.profile-filter-preset:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.profile-filter-preset.is-active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--paper);
+}
+
+.profile-filter-form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 0.75rem;
+}
+
+.profile-filter-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.profile-filter-field input {
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    color: var(--ink);
+    background: var(--paper-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 0.4rem 0.6rem;
+}
+
+.profile-filter-field input:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+
+.profile-filter-form.is-active .profile-filter-field input {
+    border-color: var(--accent);
+    background: var(--accent-light);
+}
+
+.profile-filter-apply {
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--paper);
+    background: var(--accent);
+    border: 1px solid var(--accent);
+    border-radius: var(--radius-sm);
+    padding: 0.45rem 1.1rem;
+    cursor: pointer;
+}
+
+.profile-filter-apply:hover {
+    background: var(--ink);
+    border-color: var(--ink);
+}
+
 /* Stats ------------------------------------------------------------- */
 
 .profile-stats {
@@ -262,4 +355,6 @@
     .profile-header { flex-direction: column; text-align: center; gap: 1rem; }
     .profile-stats { grid-template-columns: 1fr; gap: 1rem; }
     .profile-bar-row { grid-template-columns: 80px 1fr 80px; }
+    .profile-filter { flex-direction: column; align-items: stretch; padding: 1.25rem; }
+    .profile-filter-form { flex-direction: column; align-items: stretch; }
 }

@@ -1,9 +1,18 @@
+import calendar
 import os
 import re
 import sqlite3
-from datetime import datetime
+from datetime import date, datetime
 
-from flask import Flask, redirect, render_template, request, session, url_for
+from flask import (
+    Flask,
+    flash,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
+)
 from werkzeug.security import check_password_hash
 
 from database.db import create_user, get_db, get_user_by_email, init_db, seed_db
@@ -23,6 +32,74 @@ app.secret_key = os.environ.get("SECRET_KEY", "dev-only-secret-key")
 with app.app_context():
     init_db()
     seed_db()
+
+
+# ------------------------------------------------------------------ #
+# Date filter helpers                                                 #
+# ------------------------------------------------------------------ #
+
+def _parse_iso_date(value):
+    """Return value as a canonical 'YYYY-MM-DD' string, or None if invalid.
+
+    strptime also accepts non-padded input like '2026-1-5'; re-serialising
+    via isoformat() normalises it so ISO strings compare correctly.
+    """
+    if not value:
+        return None
+    try:
+        return datetime.strptime(value, "%Y-%m-%d").date().isoformat()
+    except ValueError:
+        return None
+
+
+def _resolve_date_range(args):
+    """Return the validated (date_from, date_to) from query args.
+
+    Both bounds are required; a missing or malformed bound means no filter.
+    A reversed range flashes an error and also means no filter.
+    """
+    date_from = _parse_iso_date(args.get("date_from"))
+    date_to = _parse_iso_date(args.get("date_to"))
+    if date_from is None or date_to is None:
+        return None, None
+    # Canonical ISO date strings sort chronologically
+    if date_from > date_to:
+        flash("Start date must be before end date.")
+        return None, None
+    return date_from, date_to
+
+
+def _months_ago(d, n):
+    """Return the date n months before d, clamping the day to the month's end."""
+    month_index = d.year * 12 + (d.month - 1) - n
+    year, month = divmod(month_index, 12)
+    month += 1
+    day = min(d.day, calendar.monthrange(year, month)[1])
+    return date(year, month, day)
+
+
+def _build_presets(today):
+    """Quick-select ranges for the profile filter bar, as ISO strings.
+
+    Each preset has a stable `key` (used for the active state), a display
+    `label`, and its date bounds. "All Time" has no bounds.
+    """
+    today_iso = today.isoformat()
+    starts = [
+        ("this_month", "This Month", today.replace(day=1)),
+        ("last_3_months", "Last 3 Months", _months_ago(today, 3)),
+        ("last_6_months", "Last 6 Months", _months_ago(today, 6)),
+    ]
+    presets = [
+        {"key": key, "label": label,
+         "date_from": start.isoformat(), "date_to": today_iso}
+        for key, label, start in starts
+    ]
+    presets.append(
+        {"key": "all_time", "label": "All Time",
+         "date_from": None, "date_to": None}
+    )
+    return presets
 
 
 # ------------------------------------------------------------------ #
@@ -112,12 +189,28 @@ def profile():
         return redirect(url_for("login"))
     user["initials"] = "".join(w[0] for w in user["name"].split()[:2]).upper()
 
-    transactions = get_recent_transactions(session["user_id"])
+    date_from, date_to = _resolve_date_range(request.args)
+
+    transactions = get_recent_transactions(
+        session["user_id"], date_from=date_from, date_to=date_to
+    )
     for t in transactions:
         t["date"] = datetime.strptime(t["date"], "%Y-%m-%d").strftime("%d %b %Y")
 
-    stats = get_summary_stats(session["user_id"])
-    categories = get_category_breakdown(session["user_id"])
+    stats = get_summary_stats(
+        session["user_id"], date_from=date_from, date_to=date_to
+    )
+    categories = get_category_breakdown(
+        session["user_id"], date_from=date_from, date_to=date_to
+    )
+
+    presets = _build_presets(date.today())
+    # Key of the matching preset, or None for a custom range
+    active_preset = next(
+        (p["key"] for p in presets
+         if (p["date_from"], p["date_to"]) == (date_from, date_to)),
+        None,
+    )
 
     return render_template(
         "profile.html",
@@ -125,6 +218,10 @@ def profile():
         stats=stats,
         transactions=transactions,
         categories=categories,
+        presets=presets,
+        active_preset=active_preset,
+        date_from=date_from,
+        date_to=date_to,
     )
 
 
