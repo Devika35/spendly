@@ -1,0 +1,136 @@
+/* ------------------------------------------------------------------ */
+/* Analytics — coming soon                                             */
+/* ------------------------------------------------------------------ */
+
+.analytics-section {
+    min-height: calc(100vh - 60px - 100px);
+    padding: 4rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--paper) 0%, #ecebe8 100%);
+}
+
+.analytics-card {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    max-width: 420px;
+    background: var(--paper-card);
+    border-radius: var(--radius-lg);
+    padding: 2.75rem 2.5rem 2.25rem;
+    text-align: center;
+    box-shadow:
+        0 1px 2px rgba(15, 15, 15, 0.04),
+        0 24px 48px -12px rgba(15, 15, 15, 0.14);
+}
+
+/* Soft decorative circles in the card corners */
+.analytics-blob {
+    position: absolute;
+    border-radius: 50%;
+    background: var(--paper-warm);
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.analytics-blob-top {
+    width: 120px;
+    height: 120px;
+    top: -50px;
+    right: -50px;
+}
+
+.analytics-blob-bottom {
+    width: 110px;
+    height: 110px;
+    bottom: -55px;
+    left: -45px;
+}
+
+.analytics-icon {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    border-radius: 14px;
+    background: linear-gradient(145deg, #34574a 0%, #284438 100%);
+    color: var(--paper-card);
+    box-shadow: 0 10px 20px -6px rgba(40, 68, 56, 0.45);
+    margin-bottom: 1.5rem;
+}
+
+.analytics-badge {
+    position: relative;
+    display: inline-block;
+    background: #2f4c40;
+    color: var(--paper-card);
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.5rem 1rem;
+    border-radius: 999px;
+    margin-bottom: 1.1rem;
+}
+
+.analytics-title {
+    position: relative;
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 1.75rem;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    color: #1f3a2e;
+    margin-bottom: 0.9rem;
+}
+
+.analytics-subtitle {
+    position: relative;
+    font-size: 0.9rem;
+    line-height: 1.7;
+    color: var(--ink-soft);
+    max-width: 300px;
+    margin: 0 auto 1.75rem;
+}
+
+/* Three pulsing dots */
+.analytics-dots {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+}
+
+.analytics-dots span {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #8a9893;
+    animation: analytics-pulse 1.4s ease-in-out infinite;
+}
+
+.analytics-dots span:nth-child(2) { animation-delay: 0.2s; }
+.analytics-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes analytics-pulse {
+    0%, 100% { background: #8a9893; transform: scale(1); }
+    50%      { background: #2f4c40; transform: scale(1.15); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .analytics-dots span { animation: none; }
+}
+
+.analytics-note {
+    position: relative;
+    font-size: 0.75rem;
+    color: var(--ink-faint);
+}
+
+@media (max-width: 600px) {
+    .analytics-section { padding: 2.5rem 1rem; }
+    .analytics-card { padding: 2.25rem 1.5rem 2rem; }
+}
