@@ -22,6 +22,7 @@
                 {% if session.get('user_id') %}
                 <a href="{{ url_for('analytics') }}"
                    {% if request.endpoint == 'analytics' %}class="active" aria-current="page"{% endif %}>Analytics</a>
+                <a href="{{ url_for('add_expense') }}">Add Expense</a>
                 <span>{{ session['user_name'] }}</span>
                 <a href="{{ url_for('logout') }}" class="nav-cta">Sign out</a>
                 {% else %}

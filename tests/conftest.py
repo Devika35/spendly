@@ -15,7 +15,8 @@ def test_db(tmp_path, monkeypatch):
 @pytest.fixture
 def app():
     """Used by pytest-flask to provide the `client` fixture."""
-    flask_app.config.update(TESTING=True)
+    # CSRF is off so tests can post forms directly; CSRF tests switch it back on
+    flask_app.config.update(TESTING=True, CSRF_ENABLED=False)
     return flask_app
 
 
