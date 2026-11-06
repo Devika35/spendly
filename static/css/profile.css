@@ -30,6 +30,35 @@
     margin-bottom: 1.25rem;
 }
 
+.profile-card-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+}
+
+.profile-card-header .profile-card-title {
+    margin-bottom: 0;
+}
+
+.profile-add-btn {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--paper);
+    background: var(--accent);
+    border: 1px solid var(--accent);
+    border-radius: var(--radius-sm);
+    padding: 0.45rem 1.1rem;
+    white-space: nowrap;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.profile-add-btn:hover {
+    background: var(--ink);
+    border-color: var(--ink);
+}
+
 .profile-label {
     font-size: 0.75rem;
     font-weight: 500;

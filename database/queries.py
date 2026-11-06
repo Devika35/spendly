@@ -1,4 +1,4 @@
-"""Read-only query helpers for the profile page.
+"""Query helpers for expenses: profile-page reads plus the insert for adding.
 
 Pure data access: no Flask imports. Every helper opens its own connection via
 get_db() and closes it before returning.
@@ -151,3 +151,27 @@ def get_category_breakdown(user_id, date_from=None, date_to=None):
 
 
 # --- END CATEGORY BREAKDOWN ----------------------------------------- #
+
+
+# --- WRITES --------------------------------------------------------- #
+
+def insert_expense(user_id, amount, category, expense_date, description):
+    """Insert one expense for the user and return its new id.
+
+    Expects already-validated values: expense_date as an ISO 'YYYY-MM-DD'
+    string and description as a string or None.
+    """
+    conn = get_db()
+    try:
+        cursor = conn.execute(
+            "INSERT INTO expenses (user_id, amount, category, date, description) "
+            "VALUES (?, ?, ?, ?, ?)",
+            (user_id, amount, category, expense_date, description),
+        )
+        conn.commit()
+        return cursor.lastrowid
+    finally:
+        conn.close()
+
+
+# --- END WRITES ----------------------------------------------------- #
