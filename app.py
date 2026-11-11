@@ -29,10 +29,12 @@ from database.db import (
 )
 from database.queries import (
     get_category_breakdown,
+    get_expense_by_id,
     get_recent_transactions,
     get_summary_stats,
     get_user_by_id,
     insert_expense,
+    update_expense,
 )
 
 EMAIL_PATTERN = re.compile(r"[^@\s]+@[^@\s]+\.[^@\s]+")
@@ -171,8 +173,8 @@ def _validate_expense_form(form):
     """Validate submitted expense fields.
 
     Returns (values, error). On success error is None and values is a dict of
-    insert_expense() keyword arguments (amount, category, expense_date,
-    description) ready to store. On failure
+    insert_expense() / update_expense() keyword arguments (amount, category,
+    expense_date, description) ready to store. On failure
     values is None and error is a user-facing message.
     """
     amount_raw = form.get("amount", "").strip()
@@ -362,6 +364,43 @@ def add_expense():
     )
 
 
+@app.route("/expenses/<int:expense_id>/edit", methods=["GET", "POST"])
+@login_required
+def edit_expense(expense_id):
+    user_id = session["user_id"]
+    # Scoped by user_id: a missing expense and another user's expense both
+    # 404, so the response never reveals whether the id exists
+    expense = get_expense_by_id(expense_id, user_id)
+    if expense is None:
+        abort(404)
+
+    error = None
+    if request.method == "POST":
+        form = request.form
+        values, error = _validate_expense_form(form)
+        if error is None:
+            if update_expense(expense_id, user_id, **values) == 0:
+                # Deleted between the lookup above and this update
+                abort(404)
+            return redirect(url_for("profile"))
+    else:
+        form = {
+            "amount": f"{expense['amount']:.2f}",
+            "category": expense["category"],
+            "date": expense["date"],
+            "description": expense["description"] or "",
+        }
+
+    return render_template(
+        "edit_expense.html",
+        expense_id=expense_id,
+        categories=CATEGORIES,
+        form=form,
+        error=error,
+        max_description_length=MAX_DESCRIPTION_LENGTH,
+    )
+
+
 @app.route("/terms")
 def terms():
     return render_template("terms.html")
@@ -375,11 +414,6 @@ def privacy():
 # ------------------------------------------------------------------ #
 # Placeholder routes — students will implement these                  #
 # ------------------------------------------------------------------ #
-
-@app.route("/expenses/<int:id>/edit")
-def edit_expense(id):
-    return "Edit expense — coming in Step 8"
-
 
 @app.route("/expenses/<int:id>/delete")
 def delete_expense(id):
