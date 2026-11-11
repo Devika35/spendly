@@ -1,4 +1,5 @@
-"""Query helpers for expenses: profile-page reads plus the insert for adding.
+"""Query helpers for expenses: profile-page reads plus the writes for adding
+and editing.
 
 Pure data access: no Flask imports. Every helper opens its own connection via
 get_db() and closes it before returning.
@@ -47,7 +48,8 @@ def get_user_by_id(user_id):
 def get_recent_transactions(user_id, limit=10, date_from=None, date_to=None):
     """Return the user's newest expenses as a list of dicts (newest first).
 
-    Each dict has keys date (ISO 'YYYY-MM-DD'), description, category, amount.
+    Each dict has keys id, date (ISO 'YYYY-MM-DD'), description, category,
+    amount.
     Optional date_from / date_to (ISO strings) limit results to that inclusive
     range. Returns [] if the user has no expenses in range.
     """
@@ -55,7 +57,7 @@ def get_recent_transactions(user_id, limit=10, date_from=None, date_to=None):
     conn = get_db()
     try:
         rows = conn.execute(
-            "SELECT date, description, category, amount FROM expenses "
+            "SELECT id, date, description, category, amount FROM expenses "
             f"WHERE user_id = ?{date_sql} ORDER BY date DESC, id DESC LIMIT ?",
             (user_id, *date_params, limit),
         ).fetchall()
@@ -64,6 +66,7 @@ def get_recent_transactions(user_id, limit=10, date_from=None, date_to=None):
 
     return [
         {
+            "id": row["id"],
             "date": row["date"],
             "description": row["description"],
             "category": row["category"],
@@ -153,6 +156,38 @@ def get_category_breakdown(user_id, date_from=None, date_to=None):
 # --- END CATEGORY BREAKDOWN ----------------------------------------- #
 
 
+# --- SINGLE EXPENSE ------------------------------------------------- #
+
+def get_expense_by_id(expense_id, user_id):
+    """Return one of the user's expenses as a dict, or None.
+
+    Scoped by user_id, so another user's expense is indistinguishable from a
+    missing one. Keys: id, amount, category, date (ISO), description.
+    """
+    conn = get_db()
+    try:
+        row = conn.execute(
+            "SELECT id, amount, category, date, description FROM expenses "
+            "WHERE id = ? AND user_id = ?",
+            (expense_id, user_id),
+        ).fetchone()
+    finally:
+        conn.close()
+
+    if row is None:
+        return None
+    return {
+        "id": row["id"],
+        "amount": row["amount"],
+        "category": row["category"],
+        "date": row["date"],
+        "description": row["description"],
+    }
+
+
+# --- END SINGLE EXPENSE --------------------------------------------- #
+
+
 # --- WRITES --------------------------------------------------------- #
 
 def insert_expense(user_id, amount, category, expense_date, description):
@@ -170,6 +205,26 @@ def insert_expense(user_id, amount, category, expense_date, description):
         )
         conn.commit()
         return cursor.lastrowid
+    finally:
+        conn.close()
+
+
+def update_expense(expense_id, user_id, amount, category, expense_date, description):
+    """Update one of the user's expenses and return the number of rows changed.
+
+    Takes the same already-validated values as insert_expense(). Returns 0 if
+    the expense doesn't exist or belongs to another user.
+    """
+    conn = get_db()
+    try:
+        cursor = conn.execute(
+            "UPDATE expenses "
+            "SET amount = ?, category = ?, date = ?, description = ? "
+            "WHERE id = ? AND user_id = ?",
+            (amount, category, expense_date, description, expense_id, user_id),
+        )
+        conn.commit()
+        return cursor.rowcount
     finally:
         conn.close()
 

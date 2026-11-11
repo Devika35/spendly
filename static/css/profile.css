@@ -289,6 +289,42 @@
     color: var(--ink);
 }
 
+/* Row actions (Edit link) ------------------------------------------- */
+
+.profile-table .profile-actions {
+    width: 1%;
+    text-align: right;
+    white-space: nowrap;
+}
+
+.profile-edit-link {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--accent);
+    text-decoration: none;
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--radius-sm);
+    transition: background 0.15s ease;
+}
+
+.profile-edit-link:hover,
+.profile-edit-link:focus-visible {
+    background: var(--accent-light);
+}
+
+/* Hidden visually but still announced by screen readers */
+.profile-sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+}
+
 .profile-empty {
     color: var(--ink-muted);
     text-align: center;
