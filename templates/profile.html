@@ -91,6 +91,9 @@
                                     <a href="{{ url_for('edit_expense', expense_id=t.id) }}"
                                        class="profile-edit-link"
                                        aria-label="Edit {{ t.description or t.category }} on {{ t.date }}">Edit</a>
+                                    <a href="{{ url_for('delete_expense', expense_id=t.id) }}"
+                                       class="profile-delete-link"
+                                       aria-label="Delete {{ t.description or t.category }} on {{ t.date }}">Delete</a>
                                 </td>
                             </tr>
                             {% else %}

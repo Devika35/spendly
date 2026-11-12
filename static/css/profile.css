@@ -289,7 +289,7 @@
     color: var(--ink);
 }
 
-/* Row actions (Edit link) ------------------------------------------- */
+/* Row actions (Edit / Delete links) --------------------------------- */
 
 .profile-table .profile-actions {
     width: 1%;
@@ -310,6 +310,23 @@
 .profile-edit-link:hover,
 .profile-edit-link:focus-visible {
     background: var(--accent-light);
+}
+
+.profile-delete-link {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--ink-muted);
+    text-decoration: none;
+    padding: 0.25rem 0.5rem;
+    margin-left: 0.25rem;
+    border-radius: var(--radius-sm);
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.profile-delete-link:hover,
+.profile-delete-link:focus-visible {
+    color: var(--danger);
+    background: var(--danger-light);
 }
 
 /* Hidden visually but still announced by screen readers */
