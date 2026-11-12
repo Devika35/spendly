@@ -28,6 +28,7 @@ from database.db import (
     seed_db,
 )
 from database.queries import (
+    delete_expense_by_id,
     get_category_breakdown,
     get_expense_by_id,
     get_recent_transactions,
@@ -401,6 +402,28 @@ def edit_expense(expense_id):
     )
 
 
+@app.route("/expenses/<int:expense_id>/delete", methods=["GET", "POST"])
+@login_required
+def delete_expense(expense_id):
+    user_id = session["user_id"]
+    # Scoped by user_id, like edit_expense: missing and foreign ids both 404
+    expense = get_expense_by_id(expense_id, user_id)
+    if expense is None:
+        abort(404)
+
+    # GET only confirms; the row is removed by a CSRF-checked POST
+    if request.method == "POST":
+        if delete_expense_by_id(expense_id, user_id) == 0:
+            # Deleted between the lookup above and this delete
+            abort(404)
+        return redirect(url_for("profile"))
+
+    expense["display_date"] = datetime.strptime(
+        expense["date"], "%Y-%m-%d"
+    ).strftime("%d %b %Y")
+    return render_template("delete_expense.html", expense=expense)
+
+
 @app.route("/terms")
 def terms():
     return render_template("terms.html")
@@ -409,15 +432,6 @@ def terms():
 @app.route("/privacy")
 def privacy():
     return render_template("privacy.html")
-
-
-# ------------------------------------------------------------------ #
-# Placeholder routes — students will implement these                  #
-# ------------------------------------------------------------------ #
-
-@app.route("/expenses/<int:id>/delete")
-def delete_expense(id):
-    return "Delete expense — coming in Step 9"
 
 
 if __name__ == "__main__":

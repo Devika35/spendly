@@ -1,5 +1,5 @@
-"""Query helpers for expenses: profile-page reads plus the writes for adding
-and editing.
+"""Query helpers for expenses: profile-page reads plus the writes for adding,
+editing and deleting.
 
 Pure data access: no Flask imports. Every helper opens its own connection via
 get_db() and closes it before returning.
@@ -222,6 +222,23 @@ def update_expense(expense_id, user_id, amount, category, expense_date, descript
             "SET amount = ?, category = ?, date = ?, description = ? "
             "WHERE id = ? AND user_id = ?",
             (amount, category, expense_date, description, expense_id, user_id),
+        )
+        conn.commit()
+        return cursor.rowcount
+    finally:
+        conn.close()
+
+
+def delete_expense_by_id(expense_id, user_id):
+    """Delete one of the user's expenses and return the number of rows removed.
+
+    Returns 0 if the expense doesn't exist or belongs to another user.
+    """
+    conn = get_db()
+    try:
+        cursor = conn.execute(
+            "DELETE FROM expenses WHERE id = ? AND user_id = ?",
+            (expense_id, user_id),
         )
         conn.commit()
         return cursor.rowcount
